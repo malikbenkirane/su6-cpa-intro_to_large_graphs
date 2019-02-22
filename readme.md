@@ -1,4 +1,4 @@
-Handling Complex graphs in C
+Handling complex graphs in C
 ============================
 
 The assignement text is availble here :
