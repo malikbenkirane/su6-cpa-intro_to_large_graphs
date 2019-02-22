@@ -4,25 +4,26 @@
 #include "targets.h"
 #define N_MIN 1024
 
-typedef	enum		gsize_err_t {
+typedef	enum			gsize_err_t {
 	FILE_ERROR,
-	INDEXING_ERROR,
 	ALLOC_ERROR
-}			gsize_err_t;
+}				gsize_err_t;
 
-typedef	struct		gsize_t {
-	unsigned	nl;
-	unsigned	nv;
-	unsigned	*degrees;
-	gsize_err_t	err;
-}			gsize_t;
+typedef	struct			gsize_t {
+	unsigned		nl;		// number of links
+	unsigned		nv;		// number of vertices
+	unsigned		*degrees;	// degrees indexed by vertex
+	unsigned		dmax;		// maximal degree
+	gsize_err_t		err;		// error
+}				gsize_t;
 
 int
 size_of_graph(gsize_t *gsize) {
-	unsigned	nl, nv;
-	unsigned	u, v;
-	unsigned	*degrees;
-	unsigned	imax, ialloc;
+	unsigned		nl, nv;
+	unsigned		u, v;
+	unsigned		*degrees;
+	unsigned 		dmax;
+	unsigned		imax, ialloc;
 	FILE			*fd;
 
 	if ((fd = fopen(FILENAME, "r")) == NULL) {
@@ -35,11 +36,12 @@ size_of_graph(gsize_t *gsize) {
 		gsize->err = ALLOC_ERROR;
 		return (-1);
 	}
-	for (int i = 0; i < ialloc; i++)
+	for (unsigned i = 0; i < ialloc; i++)
 		degrees[i] = 0;
 	nl = 0;
 	nv = 0;
 	imax = 0;
+	dmax = 0;
 	while(fscanf(fd, "%u %u", &u, &v) == 2) {
 		if (u > imax) imax = u;
 		if (v > imax) imax = v;
@@ -49,24 +51,40 @@ size_of_graph(gsize_t *gsize) {
 				gsize->err = ALLOC_ERROR;
 				return (-1);
 			}
-			for (int i = ialloc; i <= imax; i++)
+			for (unsigned i = ialloc; i <= imax; i++)
 				degrees[i] = 0;
 			ialloc = imax + 1;
 		}
 		//printf("%u %u nalloc %u\n", u, v, ialloc);
-		if (degrees[u] == 0) nv++;
-		if (degrees[v] == 0) nv++;
-		degrees[u]++;
-		degrees[v]++;
+		if (degrees[u]++ == 0) nv++;
+		if (degrees[v]++ == 0) nv++;
+		if (degrees[u] > dmax) dmax = degrees[u];
+		if (degrees[v] > dmax) dmax = degrees[v];
 		nl++;
 	}
 	fclose(fd);
 	gsize->nl = nl;
 	gsize->nv = nv;
 	gsize->degrees = degrees;
+	gsize->dmax = dmax;
 	return (0);
 }
 
+unsigned *
+graph_distributions(gsize_t *gsize) {
+	unsigned		*dis;
+
+	if (gsize->degrees == NULL)
+		return (NULL);
+	if ((dis = (unsigned *)malloc(sizeof(*dis) * (gsize->dmax+1))) == NULL)
+		return (NULL);
+	for (unsigned d = 0; d <= gsize->dmax; d++)
+		dis[d] = 0;
+	for (unsigned i = 0; i < gsize->nv; i++)
+		dis[gsize->degrees[i]]++;
+	return dis;
+}
+	
 unsigned long long
 degrees_product(gsize_t *gsize) {
 	unsigned long long	q;
@@ -81,15 +99,16 @@ degrees_product(gsize_t *gsize) {
 	}
 	return (q);
 }
+/** XXX :	compact the representation to reduce zeros
+ *		by addinng one more level of indirection
+ */
 
-void	print_gsize_err(gsize_err_t err) {
+void
+print_gsize_err(gsize_err_t err) {
 	printf("error: ");
 	switch (err) {
 	case FILE_ERROR:
 		printf("FILE_ERROR");
-		break;
-	case INDEXING_ERROR:
-		printf("INDEXING_ERROR");
 		break;
 	case ALLOC_ERROR:
 		printf("ALLOC_ERROR");
@@ -98,13 +117,37 @@ void	print_gsize_err(gsize_err_t err) {
 	printf("\n");
 }
 
-int	main() {
-	struct gsize_t gsize;
+#ifdef ESSENTIALS
+void
+print_gsize_essentials(gsize_t *gsize) {
+	printf("nv: %u\nnl: %u\n", gsize->nv, gsize->nl);
+	printf("q: %llu\n", degrees_product(gsize));
+}
+#endif
+
+#ifdef DISTRIBUTIONS
+void
+print_degree_distribution(gsize_t *gsize) {
+	unsigned		*dis;
+	
+	dis = graph_distributions(gsize);
+	for (unsigned d = 0; d < gsize->dmax; d++)
+		if (dis[d]) printf("%u %u\n", d, dis[d]);
+}
+#endif
+
+int
+main() {
+	struct gsize_t		gsize;
 	
 	if (size_of_graph(&gsize) == 0) {
-		printf("nv: %u\nnl: %u\n", gsize.nv, gsize.nl);
-		printf("q: %llu\n", degrees_product(&gsize));
-		return(0);
+#ifdef ESSENTIALS
+		print_gsize_essentials(&gsize);
+#elif DISTRIBUTIONS
+		print_degree_distribution(&gsize);
+#endif
+		free(gsize.degrees);
+		return (0);
 	}
 	print_gsize_err(gsize.err);
 	return (-1);
