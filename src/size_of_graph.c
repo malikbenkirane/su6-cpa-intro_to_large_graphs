@@ -69,7 +69,9 @@ graph_distributions(gsize_t *gsize) {
 	for (unsigned d = 0; d <= gsize->dmax; d++)
 		dis[d] = 0;
 	for (unsigned i = 0; i < gsize->nv; i++)
-		dis[gsize->degrees[i]]++;
+		if (gsize->degrees[i] > 0)  
+			dis[gsize->degrees[i]]++;
+		// otherwise the node is not there
 	return dis;
 }
 	
