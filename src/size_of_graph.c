@@ -1,21 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "gsize.h"
 #include "targets.h"
 #define N_MIN 1024
-
-typedef	enum			gsize_err_t {
-	FILE_ERROR,
-	ALLOC_ERROR
-}				gsize_err_t;
-
-typedef	struct			gsize_t {
-	unsigned		nl;		// number of links
-	unsigned		nv;		// number of vertices
-	unsigned		*degrees;	// degrees indexed by vertex
-	unsigned		dmax;		// maximal degree
-	gsize_err_t		err;		// error
-}				gsize_t;
 
 int
 size_of_graph(gsize_t *gsize) {
@@ -36,7 +24,7 @@ size_of_graph(gsize_t *gsize) {
 		gsize->err = ALLOC_ERROR;
 		return (-1);
 	}
-	for (unsigned i = 0; i < ialloc; i++)
+	for (unsigned i = 0; i <= ialloc; i++)
 		degrees[i] = 0;
 	nl = 0;
 	nv = 0;
