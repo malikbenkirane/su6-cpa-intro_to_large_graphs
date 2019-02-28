@@ -32,3 +32,14 @@ assets/com-orkut.ungraph.txt
 |LJ             |26.42s|478.32M  |789000450609   |3997962 |34681189  |
 |ORKUT          |36s   |1.647G   |22292678512329 |3072441 |117185083 |
 |FRIENDSTER     |14m48s|30.142G  |379856554324947|65608366|1806067135|
+
+# degrees distributions
+
+Files are at `assets/distributions`
+
+Email and Amazon: less than one second
+Orkut:       real    0m19.651s
+LJ:          real    0m19.651s
+friendster : real    7m32.075s
+
+TODO: plot the obtained degree distributions
