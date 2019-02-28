@@ -52,6 +52,6 @@ By plotting $y(d)=n_d$ where $d$ is the degree and $n_d$ the number of nodes of 
 
 ![degrees distribution all in one figure](./assets/distributions/all_in_one.png)
 
-If then we take a look at each graph one by one, every graph but AMAZON's has mostly nodes connected to only one other node. Sorting by number of nodes the AMAZON's graph has mostly nodes of degree 4 then 5 and then 3 but the other graphs have nodes of degree 1 first.
+If then we take a look at each graph one by one, every graph but AMAZON's has mostly nodes connected to one and only one other node. Sorting by number of nodes the AMAZON's graph has mostly nodes of degree 4.
 
 ![degree distributions per graph](assets/distributions/all_separate.png)
