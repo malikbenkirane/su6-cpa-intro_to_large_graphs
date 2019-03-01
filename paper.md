@@ -52,6 +52,18 @@ By plotting $y(d)=n_d$ where $d$ is the degree and $n_d$ the number of nodes of 
 
 ![degrees distribution all in one figure](./assets/distributions/all_in_one.png)
 
-If then we take a look at each graph one by one, every graph but AMAZON's has mostly nodes connected to one and only one other node. Sorting by number of nodes the AMAZON's graph has mostly nodes of degree 4.
+If then we take a look at each graph one by one, every graph but AMAZON's has mostly nodes connected to one and only one other node. By sorting the degree by the number of nodes the AMAZON's graph has most nodes of degree 4. Plots with logarithmic scale (Figure A.) shows less sparse details on the distribution. The latter also shows highly connected nodes on the FRIENDSTER's graph.
 
-![degree distributions per graph](assets/distributions/all_separate.png)
+![figure a](assets/distributions/figure_a.png)
+
+## Holding graphs into Memory
+
+On our laptops, either with SSD or HDD, accessing and reading files takes more time than reading the RAM memory. On modern laptops and with a modest  budget, one can get try to run the upcoming only with 4GB of RAM. Even if there will not be enough memory to put the whole graph, we can try to extract smaller features that holds into the memory. There is at least three common ways to write the structure of a graph :
+
+* list of edges (in this case study this is the input we're given)
+* adjacency matrix (worst case for memory $O(n^2)$ and imagine for instance $n\sim10^9$)
+* adjacency lists (best candidate)
+
+We've implemented all of the three structures and they all suits well for the EMAIL graph. We also already almost know the size for each of the graph for the first structure. Though, the adjancency matrix is really bad for very large graphs. Indeed, most of complex graphs are sparse and the adjacency matrix will mostly be zeros. Finally the adjacency list can be seen as a wishable compression of the edges list.
+
+The three datastructures are implemented in `src/load_graph.c` and are ready to test. In order to test them pass to the compiler a suite of `-D` flags fitting to your needs. For instance

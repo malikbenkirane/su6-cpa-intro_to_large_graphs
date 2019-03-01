@@ -3,6 +3,10 @@
 #include "targets.h"
 #define MINALLOC 2048
 
+#ifdef PPTI
+#include "memtest.h"
+#endif
+
 #ifdef LOADLIST
 unsigned *
 load_as_list(unsigned *size) {
@@ -174,6 +178,8 @@ load_as_glist(glist_t *g)
 	return (0);
 }
 
+#ifdef PRINT
+#ifdef LOADMATRIX
 void
 print_matrix(unsigned size, unsigned **rows) {
 	for (unsigned i = 0; i < size; i++) {
@@ -182,12 +188,18 @@ print_matrix(unsigned size, unsigned **rows) {
 		printf("\n");
 	}
 }
+#endif
+#endif
 
+#ifdef PRINT
+#ifdef LOADLIST
 void
 print_links(unsigned size, unsigned *links) {
 	for (unsigned i = 0; i < size; i++)
 		printf("%u %u\n", links[2*i], links[2*i+1]);
 }
+#endif
+#endif
 
 int
 main() {
@@ -199,10 +211,9 @@ main() {
 	rows = load_as_matrix(&size);
 	if (rows == NULL) return (-1);
 	printf("loaded matrix (%ux%u)\n", size, size);
+#ifdef PRINT
 	print_matrix(size, rows);
-	for (unsigned i = 0; i < size; i++)
-		free(rows[i]);
-	free(rows);
+#endif
 #endif
 #elif LOADLIST
 	unsigned 	size;
@@ -211,8 +222,9 @@ main() {
 	links = load_as_list(&size);
 	if (links == NULL) return (-1);
 	printf("loaded links (m=%u)\n", size);
+#ifdef PRINT
 	print_links(size, links);
-	free(links);
+#endif
 #elif LOADADJ
 	glist_t		g;
 
@@ -226,10 +238,17 @@ main() {
 	}
 #endif
 	printf("loaded adj (nl=%u, nv=%u)\n", g.nl, g.nv);
-	// printf("dmax = %u\n", g.dmax);
-	printf("size adj: %lu, ", sizeof(g.adj));
-	printf("size tot: %lu\n", sizeof(g));
-	printf("sizeof(char): %lu\n", sizeof(char));
+#endif
+#ifdef PPTI
+	printf("memory used: %d KB", get_memory_use());
+#endif
+#ifdef LOADMATRIX
+	for (unsigned i = 0; i < size; i++)
+		free(rows[i]);
+	free(rows);
+#elif LOADLIST
+	free(links);
+#elif LOADADJ
 	free(g.cd);
 	free(g.adj);
 #endif
