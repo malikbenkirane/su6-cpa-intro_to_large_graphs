@@ -1,5 +1,5 @@
-Handling complex graphs in C
-============================
+Handle complex graphs in C
+==========================
 
 The assignement text is availble here :
 https://www-apr.lip6.fr/~buixuan/files/cpa2018/practicalMD_tme3.pdf
@@ -13,8 +13,8 @@ WIP
 
 See [notes.md](notes.md).
 
-Getting results
---------------
+Test
+----
 
 Read [`src/targets.h`](src/targets.h) first!
 
